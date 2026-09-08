@@ -1,0 +1,9 @@
+# Ignore backend dependencies
+Social Media Backend/node_modules/
+
+# Ignore secret files
+Social Media Backend/.env
+
+# Ignore operating system junk
+.DS_Store
+Thumbs.db

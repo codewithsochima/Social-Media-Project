@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign up</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar-root"></aside>
+    <main class="main-col" style="max-width: 460px;">
+      <h1>Sign up</h1>
+      <form id="signup-form" class="card">
+        <div class="btn-row">
+          <label style="flex:1">First name
+            <input type="text" id="first_name" required />
+          </label>
+          <label style="flex:1">Last name
+            <input type="text" id="last_name" required />
+          </label>
+        </div>
+        <label>Username
+          <input type="text" id="username" required minlength="3" />
+        </label>
+        <label>Email
+          <input type="email" id="email" required autocomplete="email" />
+        </label>
+        <label>Password
+          <input type="password" id="password" required minlength="6" autocomplete="new-password" />
+        </label>
+        <div id="form-error" class="error" style="display:none;"></div>
+        <button type="submit" id="submit-btn">Create account</button>
+      </form>
+      <p>Already have an account? <a href="login.html">Log in</a></p>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>

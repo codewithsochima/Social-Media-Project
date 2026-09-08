@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feed</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell with-right">
+    <aside id="sidebar-root"></aside>
+
+    <main class="main-col">
+      <div class="feed-header">
+        <h1>Feed</h1>
+        <div class="feed-tabs">
+          <button data-sort="timestamp" data-order="desc" class="active">Recents</button>
+          <button data-sort="like_count" data-order="desc">Popular</button>
+          <button data-sort="comment_count" data-order="desc">Most discussed</button>
+        </div>
+      </div>
+
+      <div id="composer-root"></div>
+
+      <div class="toolbar">
+        <input type="text" id="search-input" placeholder="Search by title, author or tag..." />
+      </div>
+
+      <div id="posts-list"></div>
+      <div id="pagination" class="pagination"></div>
+    </main>
+
+    <aside class="right-col">
+      <div class="panel">
+        <h3>Suggestions</h3>
+        <div id="suggestions-list"><p class="notice">—</p></div>
+      </div>
+      <div class="panel">
+        <h3>Trending tags</h3>
+        <div id="trending-tags" class="trending-pills"></div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/feed.js"></script>
+</body>
+</html>

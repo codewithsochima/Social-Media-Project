@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>New Post</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar-root"></aside>
+    <main class="main-col" style="max-width: 640px;">
+      <h1>New post</h1>
+      <p class="post-meta">Posts start as a draft. Publish it from the post page when you're ready.</p>
+      <form id="post-form" class="card">
+        <label>Title
+          <input type="text" id="title" required />
+        </label>
+        <label>Content
+          <textarea id="content" required></textarea>
+        </label>
+        <label>Tags (comma-separated)
+          <input type="text" id="tags" placeholder="tech, life, writing" />
+        </label>
+        <div id="form-error" class="error" style="display:none;"></div>
+        <div class="btn-row">
+          <button type="submit" id="submit-btn">Save as draft</button>
+          <a class="btn secondary" href="index.html">Cancel</a>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/create-post.js"></script>
+</body>
+</html>

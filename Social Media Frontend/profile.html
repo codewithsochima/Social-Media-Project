@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside id="sidebar-root"></aside>
+    <main class="main-col">
+      <div id="profile-header"><p class="notice">Loading...</p></div>
+
+      <div class="tabs" id="tabs" style="display:none;">
+        <button data-tab="posts" class="active">Posts</button>
+        <button data-tab="following">Following</button>
+        <button data-tab="followers">Followers</button>
+      </div>
+
+      <div id="posts-tab">
+        <div class="toolbar" id="state-filter-row" style="display:none;">
+          <label style="flex-direction: row; gap: 8px; align-items: center;">
+            Filter by state:
+            <select id="state-filter">
+              <option value="">All</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </label>
+        </div>
+        <div id="posts-list"></div>
+        <div id="posts-pagination" class="pagination"></div>
+      </div>
+
+      <div id="following-tab" style="display:none;">
+        <div id="following-list"></div>
+        <div id="following-pagination" class="pagination"></div>
+      </div>
+
+      <div id="followers-tab" style="display:none;">
+        <div id="followers-list"></div>
+        <div id="followers-pagination" class="pagination"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>
