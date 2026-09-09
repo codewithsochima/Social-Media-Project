@@ -10,6 +10,11 @@ exports.signup = async (req, res) => {
       return res.status(409).json({ error: "Email address is already in use" });
     }
 
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({ error: "Username is already taken" });
+    }
+
     const newUser = new User({
       first_name,
       last_name,

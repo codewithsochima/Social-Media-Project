@@ -16,7 +16,7 @@ app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the Social Media API!" });
 });
 
-const mongoURI = process.env.mongo_URI;
+const mongoURI = process.env.MONGO_URI;
 mongoose
   .connect(mongoURI)
   .then(() => console.log("Successfully connected to MongoDB!"))
