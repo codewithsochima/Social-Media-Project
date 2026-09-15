@@ -64,3 +64,14 @@ exports.deletePost = async (req, res) => {
     return res.status(400).json({ error: error.message });
   }
 };
+
+exports.getPublishedPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ state: "published" }).sort({ createdAt: -1 });
+
+    return res.status(200).json(posts);
+
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
