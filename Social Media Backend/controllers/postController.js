@@ -67,9 +67,34 @@ exports.deletePost = async (req, res) => {
 
 exports.getPublishedPosts = async (req, res) => {
   try {
-    const posts = await Post.find({ state: "published" }).sort({ createdAt: -1 });
+    const page = parseInt(req.query.page) || 1;
 
-    return res.status(200).json(posts);
+    const skip = (page - 1) * limit; 
+
+    let queryCondition = { state: "published" };
+
+    if (req.query.tag) {
+      queryCondition.tags = req.query.tag;
+    }
+
+    if (req.query.search) {
+      queryCondition.title = { $regex: req.query.search, $options: "i" }; 
+    }
+
+    const posts = await Post.find(queryCondition)
+      .populate("author", "first_name last_name username")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalPosts = await Post.countDocuments(queryCondition);
+
+    return res.status(200).json({
+      posts,
+      currentPage: page,
+      totalPages: Math.ceil(totalPosts / limit),
+      totalResults: totalPosts,
+    });
 
   } catch (error) {
     return res.status(400).json({ error: error.message });
