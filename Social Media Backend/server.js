@@ -10,8 +10,11 @@ app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
 
+const postRoutes = require("./routes/postRoutes");
+
 app.use("/api/auth", authRoutes);
 
+app.use("/api/posts", postRoutes);
 app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the Social Media API!" });
 });
