@@ -9,14 +9,14 @@ app.use(cors());
 app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
-
 const postRoutes = require("./routes/postRoutes");
+const followRoutes = require("./routes/followRoutes");
+const likeRoutes = require("./routes/likeRoutes");
 
 app.use("/api/auth", authRoutes);
-
 app.use("/api/posts", postRoutes);
-
 app.use("/api/follow", followRoutes);
+app.use("/api/likes", likeRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the Social Media API!" });
