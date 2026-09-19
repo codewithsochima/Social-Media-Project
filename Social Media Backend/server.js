@@ -15,7 +15,7 @@ const likeRoutes = require("./routes/likeRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/follow", followRoutes);
+app.use("/api/users", followRoutes);
 app.use("/api/likes", likeRoutes);
 
 app.get("/api", (req, res) => {

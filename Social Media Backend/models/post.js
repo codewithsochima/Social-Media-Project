@@ -44,4 +44,11 @@ const PostSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+PostSchema.virtual("timestamp").get(function () {
+  return this.createdAt;
+});
+
+PostSchema.set("toJSON", { virtuals: true });
+PostSchema.set("toObject", { virtuals: true });
+
 module.exports = mongoose.model("Post", PostSchema);
