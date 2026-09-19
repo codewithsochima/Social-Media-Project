@@ -18,14 +18,17 @@ exports.createPost = async (req, res) => {
 };
 
 exports.updatePost = async (req, res) => {
-  try {    const post = await Post.findById(req.params.id);
+  try {
+    const post = await Post.findById(req.params.id);
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
     if (post.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "Forbidden: You are not the owner of this post" });
+      return res
+        .status(403)
+        .json({ error: "Forbidden: You are not the owner of this post" });
     }
 
     const { title, content, tags, state } = req.body;
@@ -38,7 +41,6 @@ exports.updatePost = async (req, res) => {
     await post.save();
 
     return res.status(200).json(post);
-
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -53,13 +55,14 @@ exports.deletePost = async (req, res) => {
     }
 
     if (post.author.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: "Forbidden: You are not the owner of this post" });
+      return res
+        .status(403)
+        .json({ error: "Forbidden: You are not the owner of this post" });
     }
 
     await post.deleteOne();
 
     return res.status(204).send();
-
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -68,8 +71,8 @@ exports.deletePost = async (req, res) => {
 exports.getPublishedPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-
-    const skip = (page - 1) * limit; 
+    const limit = 20;
+    const skip = (page - 1) * limit;
 
     let queryCondition = { state: "published" };
 
@@ -78,7 +81,7 @@ exports.getPublishedPosts = async (req, res) => {
     }
 
     if (req.query.search) {
-      queryCondition.title = { $regex: req.query.search, $options: "i" }; 
+      queryCondition.title = { $regex: req.query.search, $options: "i" };
     }
 
     const posts = await Post.find(queryCondition)
@@ -95,7 +98,6 @@ exports.getPublishedPosts = async (req, res) => {
       totalPages: Math.ceil(totalPosts / limit),
       totalResults: totalPosts,
     });
-
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -103,14 +105,16 @@ exports.getPublishedPosts = async (req, res) => {
 
 exports.getPostById = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id).populate("author", "first_name last_name username");
+    const post = await Post.findById(req.params.id).populate(
+      "author",
+      "first_name last_name username",
+    );
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
     return res.status(200).json(post);
-
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
