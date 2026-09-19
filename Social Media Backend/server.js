@@ -15,6 +15,9 @@ const postRoutes = require("./routes/postRoutes");
 app.use("/api/auth", authRoutes);
 
 app.use("/api/posts", postRoutes);
+
+app.use("/api/follow", followRoutes);
+
 app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the Social Media API!" });
 });
