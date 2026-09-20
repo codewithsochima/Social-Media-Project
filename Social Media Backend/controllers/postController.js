@@ -27,9 +27,7 @@ exports.updatePost = async (req, res) => {
     }
 
     if (post.author.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ error: "Forbidden: You are not the owner of this post" });
+      return res.status(403).json({ error: "Forbidden: You are not the owner of this post" });
     }
 
     const { title, content, tags, state } = req.body;
@@ -56,9 +54,7 @@ exports.deletePost = async (req, res) => {
     }
 
     if (post.author.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ error: "Forbidden: You are not the owner of this post" });
+      return res.status(403).json({ error: "Forbidden: You are not the owner of this post" });
     }
 
     await post.deleteOne();
@@ -125,6 +121,8 @@ exports.getPublishedPosts = async (req, res) => {
       { $limit: limit },
       {
         $project: {
+          _id: 0,
+          id: "$_id",
           title: 1,
           content: 1,
           tags: 1,
@@ -134,7 +132,7 @@ exports.getPublishedPosts = async (req, res) => {
           timestamp: "$createdAt",
           createdAt: 1,
           author: {
-            _id: 1,
+            id: "$author._id",
             first_name: 1,
             last_name: 1,
             username: 1,
