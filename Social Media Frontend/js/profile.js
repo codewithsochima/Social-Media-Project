@@ -132,9 +132,13 @@ async function loadPosts() {
         })
     );
     const posts = res.data || [];
+    
     listEl.innerHTML = posts.length
       ? posts.map(renderProfilePostCard).join("")
       : `<p class="notice">No posts yet.</p>`;
+      
+    attachPostActionListeners(listEl);
+
     renderSimplePagination(
       "posts-pagination",
       res.page || 1,
@@ -149,15 +153,63 @@ async function loadPosts() {
   }
 }
 
+function attachPostActionListeners(container) {
+  container.querySelectorAll(".publish-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault(); // Stop the link navigation
+      e.stopPropagation();
+      
+      const postId = btn.getAttribute("data-id");
+      btn.disabled = true;
+      btn.textContent = "Publishing...";
+      
+      try {
+        await apiFetch(`/posts/${postId}`, {
+          method: "PATCH",
+          auth: true,
+          body: { state: "published" }
+        });
+        
+        loadPosts();
+      } catch (err) {
+        alert("Failed to publish: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "Publish";
+      }
+    });
+  });
+}
+
 function renderProfilePostCard(post) {
-  const tags = (post.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+  const tags = (post.tags || []).map((t) => `<span class="tag">#${escapeHtml(t)}</span>`).join("");
+  
+  // Determine actions based on ownership and state
+  let actionsHtml = "";
+  if (profileState.isOwner) {
+    if (post.state === "draft") {
+      actionsHtml = `
+        <div class="btn-row" style="margin-top: 12px;">
+          <button class="btn secondary publish-btn" data-id="${post.id}" style="padding: 6px 14px; font-size: 0.85rem;">🚀 Publish</button>
+          <a href="edit-post.html?id=${post.id}" class="btn secondary" style="padding: 6px 14px; font-size: 0.85rem;">✎ Edit</a>
+        </div>
+      `;
+    } else {
+      actionsHtml = `
+        <div class="btn-row" style="margin-top: 12px;">
+          <a href="edit-post.html?id=${post.id}" class="btn secondary" style="padding: 6px 14px; font-size: 0.85rem;">✎ Edit</a>
+        </div>
+      `;
+    }
+  }
+
   return `
-    <a class="card post-card" href="post.html?id=${encodeURIComponent(post.id)}">
+    <a class="card post-card" href="post.html?id=${encodeURIComponent(post.id)}" style="display:block; text-decoration:none; color:inherit;">
       <span class="state-badge state-${post.state}">${escapeHtml(post.state)}</span>
       <h2 class="post-title">${escapeHtml(post.title)}</h2>
       <div class="post-meta">${formatDate(post.timestamp)}</div>
       <div>${tags}</div>
       <div class="stat-row"><span>❤ ${post.like_count ?? 0}</span><span>💬 ${post.comment_count ?? 0}</span></div>
+      ${actionsHtml}
     </a>
   `;
 }

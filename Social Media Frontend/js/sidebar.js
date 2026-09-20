@@ -44,28 +44,7 @@ function renderSidebar(activePage) {
             : `${navItem("login", "login.html", "🔑", "Log in")}${navItem("signup", "signup.html", "✨", "Sign up")}`
         }
       </nav>
-
-      <div class="download-card">
-        Plain HTML · CSS · JS<br />No framework, no build step.
-      </div>
-
-      <div class="settings-inline">
-        <button id="settings-btn">⚙ API settings</button>
-      </div>
     </div>
-
-    <dialog id="settings-dialog">
-      <form method="dialog" id="settings-form">
-        <h3>API settings</h3>
-        <label>Backend API base URL
-          <input type="text" id="api-url-input" placeholder="http://localhost:5000/api" />
-        </label>
-        <div class="dialog-actions">
-          <button type="button" id="settings-cancel" class="secondary">Cancel</button>
-          <button type="submit">Save</button>
-        </div>
-      </form>
-    </dialog>
   `;
 
   const logoutBtn = document.getElementById("logout-btn");
@@ -75,15 +54,4 @@ function renderSidebar(activePage) {
       window.location.href = "index.html";
     });
   }
-
-  const dialog = document.getElementById("settings-dialog");
-  document.getElementById("settings-btn").addEventListener("click", () => {
-    document.getElementById("api-url-input").value = getApiBaseUrl();
-    dialog.showModal();
-  });
-  document.getElementById("settings-cancel").addEventListener("click", () => dialog.close());
-  document.getElementById("settings-form").addEventListener("submit", () => {
-    const val = document.getElementById("api-url-input").value.trim();
-    if (val) setApiBaseUrl(val);
-  });
 }

@@ -5,11 +5,18 @@ const postController = require("../controllers/postController");
 
 const { protect } = require("../middleware/authMiddleware");
 
+const optionalProtect = async (req, res, next) => {
+  if (req.headers.authorization) {
+    return protect(req, res, next);
+  }
+  next();
+};
+
 router.get("/", postController.getPublishedPosts);
 
 router.post("/", protect, postController.createPost);
 
-router.get("/:id", postController.getPostById);
+router.get("/:id", optionalProtect, postController.getPostById);
 
 router.patch("/:id", protect, postController.updatePost);
 

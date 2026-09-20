@@ -1,4 +1,5 @@
 const Post = require("../models/post");
+const Like = require("../models/like");
 
 exports.createPost = async (req, res) => {
   try {
@@ -71,7 +72,7 @@ exports.deletePost = async (req, res) => {
 exports.getPublishedPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 20;
+    const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
     let queryCondition = { state: "published" };
@@ -81,22 +82,34 @@ exports.getPublishedPosts = async (req, res) => {
     }
 
     if (req.query.search) {
-      queryCondition.title = { $regex: req.query.search, $options: "i" };
+      const searchRegex = new RegExp(req.query.search, "i");
+      queryCondition.$or = [
+        { title: searchRegex },
+        { tags: searchRegex },
+      ];
     }
+
+    const allowedSorts = ["timestamp", "createdAt", "like_count", "comment_count"];
+    let sortField = req.query.sort || "createdAt";
+    if (sortField === "timestamp") sortField = "createdAt";
+    if (!allowedSorts.includes(sortField)) sortField = "createdAt";
+
+    const sortOrder = req.query.order === "asc" ? 1 : -1;
 
     const posts = await Post.find(queryCondition)
       .populate("author", "first_name last_name username")
-      .sort({ createdAt: -1 })
+      .sort({ [sortField]: sortOrder })
       .skip(skip)
       .limit(limit);
 
     const totalPosts = await Post.countDocuments(queryCondition);
 
     return res.status(200).json({
-      posts,
-      currentPage: page,
+      data: posts,
+      page,
+      limit,
+      total: totalPosts,
       totalPages: Math.ceil(totalPosts / limit),
-      totalResults: totalPosts,
     });
   } catch (error) {
     return res.status(400).json({ error: error.message });
@@ -107,14 +120,30 @@ exports.getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id).populate(
       "author",
-      "first_name last_name username",
+      "first_name last_name username"
     );
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    return res.status(200).json(post);
+    if (post.state === "draft") {
+      const isOwner = req.user && req.user._id.toString() === post.author._id.toString();
+      if (!isOwner) {
+        return res.status(403).json({ error: "Forbidden: This post is a draft" });
+      }
+    }
+
+    let likedByMe = null;
+    if (req.user) {
+      const likeDoc = await Like.findOne({ post: post._id, user: req.user._id });
+      likedByMe = !!likeDoc;
+    }
+
+    const postJson = post.toJSON();
+    postJson.liked_by_me = likedByMe;
+
+    return res.status(200).json(postJson);
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
