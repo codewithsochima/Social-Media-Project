@@ -75,34 +75,73 @@ exports.getPublishedPosts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    let queryCondition = { state: "published" };
-
-    if (req.query.tag) {
-      queryCondition.tags = req.query.tag;
-    }
-
-    if (req.query.search) {
-      const searchRegex = new RegExp(req.query.search, "i");
-      queryCondition.$or = [
-        { title: searchRegex },
-        { tags: searchRegex },
-      ];
-    }
-
-    const allowedSorts = ["timestamp", "createdAt", "like_count", "comment_count"];
+    const allowedSorts = ["createdAt", "like_count", "comment_count"];
     let sortField = req.query.sort || "createdAt";
     if (sortField === "timestamp") sortField = "createdAt";
     if (!allowedSorts.includes(sortField)) sortField = "createdAt";
 
     const sortOrder = req.query.order === "asc" ? 1 : -1;
 
-    const posts = await Post.find(queryCondition)
-      .populate("author", "first_name last_name username")
-      .sort({ [sortField]: sortOrder })
-      .skip(skip)
-      .limit(limit);
+    const pipeline = [
+      { $match: { state: "published" } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      { $unwind: "$author" },
+    ];
 
-    const totalPosts = await Post.countDocuments(queryCondition);
+    if (req.query.tag) {
+      pipeline.push({ $match: { tags: req.query.tag } });
+    }
+
+    if (req.query.search) {
+      const searchRegex = new RegExp(req.query.search, "i");
+      pipeline.push({
+        $match: {
+          $or: [
+            { title: searchRegex },
+            { tags: searchRegex },
+            { "author.username": searchRegex },
+            { "author.first_name": searchRegex },
+            { "author.last_name": searchRegex },
+          ],
+        },
+      });
+    }
+
+    const countPipeline = [...pipeline, { $count: "total" }];
+    const totalResult = await Post.aggregate(countPipeline);
+    const totalPosts = totalResult.length ? totalResult[0].total : 0;
+
+    const posts = await Post.aggregate([
+      ...pipeline,
+      { $sort: { [sortField]: sortOrder } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $project: {
+          title: 1,
+          content: 1,
+          tags: 1,
+          state: 1,
+          like_count: 1,
+          comment_count: 1,
+          timestamp: "$createdAt",
+          createdAt: 1,
+          author: {
+            _id: 1,
+            first_name: 1,
+            last_name: 1,
+            username: 1,
+          },
+        },
+      },
+    ]);
 
     return res.status(200).json({
       data: posts,
@@ -128,7 +167,8 @@ exports.getPostById = async (req, res) => {
     }
 
     if (post.state === "draft") {
-      const isOwner = req.user && req.user._id.toString() === post.author._id.toString();
+      const isOwner =
+        req.user && req.user._id.toString() === post.author._id.toString();
       if (!isOwner) {
         return res.status(403).json({ error: "Forbidden: This post is a draft" });
       }
